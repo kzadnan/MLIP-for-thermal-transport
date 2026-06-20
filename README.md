@@ -16,6 +16,12 @@ To make the potentials easy to pick up, each material folder also ships a
 template — swap in your own ensemble, computes, and run settings for whatever
 property you are after.
 
+## Authors
+
+- **Hao Zhou** — [haozhou332022@gmail.com](mailto:haozhou332022@gmail.com)
+- **Janak Tiwari**
+- **Tianli Feng** — [tianli.feng2011@gmail.com](mailto:tianli.feng2011@gmail.com)
+
 ---
 
 ## Repository layout
