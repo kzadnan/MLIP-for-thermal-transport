@@ -1,0 +1,120 @@
+# units       real
+units       metal
+variable    T equal 300
+variable    V equal vol
+variable    dt equal 0.001
+variable    p equal 200000     # correlation length
+variable    s equal 10      # sample interval
+variable    d equal $p*$s   # dump interval 
+
+
+# convert from LAMMPS real units to SI 
+variable    kB equal 1.3806504e-23    # [J/K] Boltzmann
+variable    eV2J equal 1.6022e-19
+variable    A2m equal 1.0e-10
+variable    ps2s equal 1.0e-12
+variable    convert equal ${eV2J}*${eV2J}/${ps2s}/${A2m} 
+variable    neq2eq equal 800000
+
+# setup problem 
+dimension    3
+boundary     p p p
+
+
+atom_style atomic
+
+# below is for argon in unit "real"
+# lattice      fcc 5.376 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+# region       box block 0 4 0 4 0 4
+# create_box   1 box
+# create_atoms 1 box
+# mass	     1 39.948
+# pair_style   lj/cut 13.0
+# pair_coeff   * * 0.2381 3.405
+
+read_data lammps.txt
+kspace_style none
+pair_style   mlip mlip.ini 
+pair_coeff   * * 
+# the short range repulsive interaction is the shell-shell (elec cloud - elec cloud) interaction
+
+timestep     ${dt}
+thermo	     $d 
+
+
+# equilibration and thermalization 
+#velocity     all create 2 9527 mom yes rot yes dist gaussian
+
+#fix          NPT_relax all npt temp 2 2 0.03 iso 0.0 0.0 0.3 
+#dump nptdumplowT  all atom 10000 npt_relax.tj
+#run 400000
+#unfix NPT_relax
+#undump nptdumplowT 
+
+
+
+velocity     all create $T 708868 mom yes rot yes dist gaussian
+
+# fix          NVT all nvt temp $T $T 10 drag 0.2
+
+#fix          NPT all npt temp $T $T 0.02 iso 0.0 0.0 0.2 
+#dump nptdump  all atom 10000 npt.tj
+#run          200000
+#undump nptdump
+
+
+fix          NVT all nvt temp $T $T 0.05 #iso 0.0 0.0 0.2 
+dump nvtdump  all atom 10000 nvt.tj
+run          200000
+undump nvtdump
+
+# thermal conductivity calculation, switch to NVE if desired 
+unfix       NVT
+fix         NVE all nve 
+run         200000
+
+
+reset_timestep 0
+
+
+# compute heat flux J
+
+compute      myKE all ke/atom                          # compute the kenatic energy, and store the value in the ID "myKE"
+compute      myPE all pe/atom                          # compute the potential energy, and store the value in the ID "myPE"
+compute      myStress all centroid/stress/atom NULL virial           # compute the stress, and store the value in the ID "myStress", virial is to exclude the kinatic energy when calculate stress matrix
+compute      flux all heat/flux myKE myPE myStress     # compute the heat flux value J, and store the value in the ID "flux"
+
+variable     Jx equal c_flux[1]/vol   # c_flux[1] is the first component of the flux J
+variable     Jy equal c_flux[2]/vol
+variable     Jz equal c_flux[3]/vol
+
+
+# compute autocorrelation function of heat flux J
+
+fix          JJ all ave/correlate $s $p $d &
+             c_flux[1] c_flux[2] c_flux[3] type auto file J0Jt.dat ave running
+
+
+variable     scale equal ${convert}/${kB}/$T/$T/$V*$s*${dt}
+
+
+# "f_" means "fix_ID", "v_" means "variable_ID", "c_" means "compute_ID"
+# f_JJ[3] is the correlation function of Jx, starting from 3 is because the first 2 columns are occupied by the time and average numbers
+# f_JJ[4] is the correlation function of Jy
+# f_JJ[5] is the correlation function of Jz
+# trap is to do integral
+
+variable     k11 equal trap(f_JJ[3])*${scale}
+variable     k22 equal trap(f_JJ[4])*${scale}
+variable     k33 equal trap(f_JJ[5])*${scale}
+
+
+# thermo output format: temperature Jx Jy Jz k11 k22 k33, output interval: "thermo"
+
+thermo_style custom step temp v_Jx v_Jy v_Jz v_k11 v_k22 v_k33
+dump nvedump  all atom 100000 nve.tj
+run          10000000
+variable     k equal (v_k11+v_k22+v_k33)/3.0
+variable     ndens equal count(all)/vol
+print        "scale=${scale}   average conductivity:k11=${k11} k22=${k22} k33=${k33}   k=$k[W/mK] @ $T K, ${ndens} /A^3" 
+

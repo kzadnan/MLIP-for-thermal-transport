@@ -1,0 +1,12 @@
+# Claude Code local settings
+.claude/
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# LAMMPS run outputs (regenerated on each run)
+log.lammps
+*.tj
+J0Jt.dat
