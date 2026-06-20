@@ -29,17 +29,12 @@ property you are after.
 ```
 mlip/
 ├── BAs/                  # Boron arsenide (B, As)
-│   ├── Pristine/
-│   ├── Antisite-pair/    # B–As antisite defect pair
-│   ├── Vacancy_As/       # As vacancy
-│   └── Vacancy_B/        # B vacancy
+│   └── Pristine/
 ├── Diamond/              # Diamond (C)
-│   ├── Pristine/
-│   └── Vacancy_C/        # C vacancy
+│   └── Pristine/
 ├── La2Zr2O7/             # Lanthanum zirconate (La, Zr, O)
 │   └── Pristine/
-├── Al2O3/                # (coming soon)
-└── MgSiO3/               # (coming soon)
+└── Al2O3/                # (coming soon)
 ```
 
 ### Files inside each working folder
