@@ -175,6 +175,13 @@ If you use these potentials or input scripts, please cite the relevant paper(s).
   > *Physical Review Materials* **8**(4), 043804 (2024).
   > DOI: [10.1103/PhysRevMaterials.8.043804](https://doi.org/10.1103/PhysRevMaterials.8.043804)
 
+- **GaN/AlN interface**:
+  > H. Zhou, K. Z. Adnan, W. A. Jones, and T. Feng,
+  > "Thermal boundary conductance in standalone and nonstandalone GaN/AlN
+  > heterostructures predicted using machine-learning interatomic potentials,"
+  > *Physical Review B* **112**(23), 235308 (2025).
+  > DOI: [10.1103/w7qp-tl6z](https://doi.org/10.1103/w7qp-tl6z)
+
 ### LAMMPS–MLIP interface (for the Green–Kubo example)
 
 If you use the Green–Kubo thermal-conductivity example, it relies on the
