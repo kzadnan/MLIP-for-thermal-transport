@@ -126,7 +126,7 @@ The `in.lmp` scripts target the **revised** many-body heat-current LAMMPS–MLIP
 
 ## License
 
-_Add a license of your choice (e.g. MIT, BSD-3-Clause) before publishing._
+Released under the [MIT License](LICENSE).
 
 ## Contact
 
