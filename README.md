@@ -11,10 +11,12 @@ and phonon properties, defect energetics, melting, and more. They are **not**
 restricted to any single application.
 
 To make the potentials easy to pick up, each material folder also ships a
-**worked example**: a ready-to-run **Green–Kubo equilibrium molecular dynamics
-(EMD)** input script for lattice thermal conductivity. Treat it as a starting
-template — swap in your own ensemble, computes, and run settings for whatever
-property you are after.
+**worked example** LAMMPS input script. Most bulk crystals come with a
+**Green–Kubo equilibrium molecular dynamics (EMD)** lattice-thermal-conductivity
+run; the **GaN/AlN heterointerface** instead comes with a **non-equilibrium MD
+(NEMD)** setup that drives a heat flux across the interface. Treat these as
+starting templates — swap in your own ensemble, computes, and run settings for
+whatever property you are after.
 
 ## Authors
 
@@ -34,6 +36,7 @@ mlip/
 │   └── Pristine/
 ├── La2Zr2O7/             # Lanthanum zirconate (La, Zr, O)
 │   └── Pristine/
+├── GaN_AlN/              # GaN/AlN heterointerface (Ga, Al, N)
 └── Al2O3/                # (coming soon)
 ```
 
@@ -44,7 +47,7 @@ mlip/
 | `pot.mtp`    | **The trained Moment Tensor Potential** — the main artifact of this repository. |
 | `mlip.ini`   | MLIP interface configuration; points to the potential file (`pot.mtp`). |
 | `lammps.txt` | Example LAMMPS data file: simulation box, atom positions, masses, and atom types. |
-| `in.lmp`     | Example LAMMPS input script: a Green–Kubo thermal-conductivity run you can use as a template. |
+| `in.lmp`     | Example LAMMPS input script you can use as a template (Green–Kubo EMD for the bulk crystals; NEMD for the GaN/AlN interface). |
 
 The potential itself is `pot.mtp`. The `lammps.txt` and `in.lmp` files are
 provided only to demonstrate how to load and use it.
@@ -120,6 +123,36 @@ heat-flux calculation specifically; ordinary MD/minimization runs do not need it
 A LAMMPS build with the revised many-body heat-current MLIP interface (see the
 interface paper in the [Citation](#citation) section) is recommended for this
 example.
+
+---
+
+## Example: GaN/AlN interface (NEMD)
+
+The `GaN_AlN/` folder provides a potential trained for the **GaN/AlN
+heterointerface** (species: Ga, Al, N), suitable for simulating the interface
+itself — interfacial structure, dynamics, and **interfacial (Kapitza) thermal
+resistance / conductance**.
+
+Its `in.lmp` is a **non-equilibrium molecular dynamics (NEMD)** example rather
+than a Green–Kubo run:
+
+1. Reads the interface structure from `lammps.txt` and the MTP from `mlip.ini`.
+2. Fixes the slab edges and equilibrates the middle region in **NVT**, then
+   **NVE**.
+3. Imposes a temperature difference with **Langevin** hot/cold reservoirs on
+   either side of the interface to drive a steady-state heat flux along `z`.
+4. Records the steady-state temperature profile (`Tgradient.txt`) and the energy
+   added/removed by the reservoirs (`f_11`, `f_12`), from which the interfacial
+   thermal conductance is obtained.
+
+Run it the same way:
+
+```bash
+lmp -in in.lmp
+```
+
+Because this is a direct NEMD calculation, it does **not** use the
+`centroid/stress/atom` heat-flux compute described above.
 
 ---
 
