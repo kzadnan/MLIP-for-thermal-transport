@@ -10,13 +10,18 @@ standard atomistic task — molecular dynamics, geometry/cell relaxation, elasti
 and phonon properties, defect energetics, melting, and more. They are **not**
 restricted to any single application.
 
-To make the potentials easy to pick up, each material folder also ships a
-**worked example** LAMMPS input script. Most bulk crystals come with a
-**Green–Kubo equilibrium molecular dynamics (EMD)** lattice-thermal-conductivity
-run; the **GaN/AlN heterointerface** instead comes with a **non-equilibrium MD
-(NEMD)** setup that drives a heat flux across the interface. Treat these as
-starting templates — swap in your own ensemble, computes, and run settings for
-whatever property you are after.
+**Some** folders also include a **worked example** LAMMPS input script to help you
+get started; others provide the potential only. Where an example is included, it
+is one of:
+
+- a **Green–Kubo equilibrium molecular dynamics (EMD)** lattice-thermal-conductivity
+  run (the bulk crystals), or
+- a **non-equilibrium MD (NEMD)** setup that drives a heat flux across an interface
+  (e.g. the GaN/AlN heterointerface).
+
+These examples are just starting templates — swap in your own ensemble, computes,
+and run settings for whatever property you are after. A folder without an example
+script still contains a complete, ready-to-use potential.
 
 ## Authors
 
@@ -38,20 +43,36 @@ mlip/
 ├── La2Zr2O7/             # Lanthanum zirconate (La, Zr, O)
 │   └── Pristine/
 ├── GaN_AlN/              # GaN/AlN heterointerface (Ga, Al, N)
-└── Al2O3/                # (coming soon)
+├── Metal_Diamond/        # Metal/diamond interfaces (coming soon)
+│   ├── Al/               #   Al/diamond
+│   ├── Zr/               #   Zr/diamond
+│   ├── Mo/               #   Mo/diamond
+│   └── Au/               #   Au/diamond
+├── ZrC/                  # Zirconium carbide (coming soon)
+├── UO2/                  # Uranium dioxide (coming soon)
+└── Al2O3/                # Alumina (coming soon)
 ```
 
-### Files inside each working folder
+Folders marked *coming soon* are placeholders; their potentials will be added
+later. Not every folder ships a LAMMPS example — see [Folder contents](#folder-contents)
+below.
 
-| File         | Purpose |
-|--------------|---------|
-| `pot.mtp`    | **The trained Moment Tensor Potential** — the main artifact of this repository. |
-| `mlip.ini`   | MLIP interface configuration; points to the potential file (`pot.mtp`). |
-| `lammps.txt` | Example LAMMPS data file: simulation box, atom positions, masses, and atom types. |
-| `in.lmp`     | Example LAMMPS input script you can use as a template (Green–Kubo EMD for the bulk crystals; NEMD for the GaN/AlN interface). |
+### Folder contents
 
-The potential itself is `pot.mtp`. The `lammps.txt` and `in.lmp` files are
-provided only to demonstrate how to load and use it.
+A populated folder always contains the potential, and **may** also contain an
+example:
+
+| File         | Always present? | Purpose |
+|--------------|:---------------:|---------|
+| `pot.mtp`    | yes             | **The trained Moment Tensor Potential** — the main artifact of this repository. |
+| `mlip.ini`   | yes             | MLIP interface configuration; points to the potential file (`pot.mtp`). |
+| `lammps.txt` | only with an example | Example LAMMPS data file: simulation box, atom positions, masses, and atom types. |
+| `in.lmp`     | only with an example | Example LAMMPS input script you can use as a template (Green–Kubo EMD for bulk crystals; NEMD for interfaces). |
+
+The potential itself is `pot.mtp`. When present, `lammps.txt` and `in.lmp` are
+provided only to demonstrate how to load and use it; many folders ship the
+potential without an example. Folders marked *coming soon* currently hold only a
+`coming_soon.txt` placeholder.
 
 ---
 
@@ -82,8 +103,9 @@ such workflow.
 
 ## Example: Green–Kubo thermal conductivity
 
-Each folder includes `in.lmp`, a complete Green–Kubo EMD script for the lattice
-thermal conductivity. From inside any working folder (e.g. `BAs/Pristine/`):
+The bulk-crystal folders that include an example ship an `in.lmp`, a complete
+Green–Kubo EMD script for the lattice thermal conductivity. From inside such a
+folder (e.g. `BAs/Pristine/`):
 
 ```bash
 lmp -in in.lmp
@@ -182,6 +204,27 @@ If you use these potentials or input scripts, please cite the relevant paper(s).
   > heterostructures predicted using machine-learning interatomic potentials,"
   > *Physical Review B* **112**(23), 235308 (2025).
   > DOI: [10.1103/w7qp-tl6z](https://doi.org/10.1103/w7qp-tl6z)
+
+- **Metal/diamond interfaces** (Al, Zr, Mo, Au):
+  > K. Z. Adnan, M. R. Neupane, and T. Feng,
+  > "Thermal boundary conductance of metal–diamond interfaces predicted by machine
+  > learning interatomic potentials,"
+  > *International Journal of Heat and Mass Transfer* **235**, 126227 (2024).
+  > DOI: [10.1016/j.ijheatmasstransfer.2024.126227](https://doi.org/10.1016/j.ijheatmasstransfer.2024.126227)
+
+- **ZrC (zirconium carbide)**:
+  > J. Tiwari and T. Feng,
+  > "Intrinsic thermal conductivity of ZrC from low to ultrahigh temperatures: A
+  > critical revisit,"
+  > *Physical Review Materials* **7**(6), 065001 (2023).
+  > DOI: [10.1103/PhysRevMaterials.7.065001](https://doi.org/10.1103/PhysRevMaterials.7.065001)
+
+- **UO₂ (uranium dioxide)**:
+  > X. Yang, J. Tiwari, and T. Feng,
+  > "Reduced anharmonic phonon scattering cross-section slows the decrease of
+  > thermal conductivity with temperature,"
+  > *Materials Today Physics* **24**, 100689 (2022).
+  > DOI: [10.1016/j.mtphys.2022.100689](https://doi.org/10.1016/j.mtphys.2022.100689)
 
 ### Moment Tensor Potential method and MLIP package
 
